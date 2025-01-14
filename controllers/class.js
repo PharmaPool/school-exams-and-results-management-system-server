@@ -437,3 +437,30 @@ module.exports.add_score = async (req, res, next) => {
     error.error(err, next);
   }
 };
+
+module.exports.get_error_students = async (req, res, next) => {
+  const cur_session = req.params.session,
+    prev_session = req.params.prev_session,
+    level = req.params.level;
+
+  try {
+    const current_session = await Session.findOne({
+      session: cur_session,
+    })
+      .populate("classes")
+    const previous_session = await Session.findOne({
+      session: prev_session,
+    }).populate("classes");
+
+    const current_level = current_session.classes.find(
+      (lev) => lev.level == level
+    ).semesters.second;
+    const previous_level = previous_session.classes.find(
+      (lev) => lev.level == Number(level) - 100
+    ).semesters.second;
+
+    res.status(200).json({ current_level, previous_level });
+  } catch (error) {
+    console.log(error);
+  }
+};

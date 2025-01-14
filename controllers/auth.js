@@ -2,7 +2,6 @@ const Admin = require("../models/admin");
 const Student = require("../models/student");
 const Class = require("../models/class");
 const Session = require("../models/session");
-const Department = require("../models/department");
 
 const error = require("../utils/error_handler");
 const jwt = require("jsonwebtoken");
@@ -240,24 +239,24 @@ module.exports.register_session = async (req, res, next) => {
   }
 };
 
-module.exports.register_department = async (req, res, next) => {
-  const department_title = req.body.department_title;
-  const password = req.body.password;
+// module.exports.register_department = async (req, res, next) => {
+//   const department_title = req.body.department_title;
+//   const password = req.body.password;
 
-  try {
-    const hashed_password = await bcrypt.hash(password, 12);
+//   try {
+//     const hashed_password = await bcrypt.hash(password, 12);
 
-    const department = new Department({
-      department: department_title,
-      password: hashed_password,
-    });
+//     const department = new Department({
+//       department: department_title,
+//       password: hashed_password,
+//     });
 
-    await department.save();
+//     await department.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "department registered successfully" });
-  } catch (err) {
-    error.error(err, next);
-  }
-};
+//     res
+//       .status(200)
+//       .json({ success: true, message: "department registered successfully" });
+//   } catch (err) {
+//     error.error(err, next);
+//   }
+// };
