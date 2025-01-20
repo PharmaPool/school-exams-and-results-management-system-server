@@ -1,9 +1,26 @@
 const Student = require("../models/student");
+const cloudinary = require("cloudinary").v2;
 
 const { getIO } = require("../utils/socket");
 const { get_session } = require("../utils/finder");
 const { get_session_gpa } = require("../utils/gpa");
 const error = require("../utils/error_handler");
+
+// Configuration
+cloudinary.config({
+  cloud_name: "dobsgzbhk",
+  api_key: "744973231822537",
+  api_secret: "F_kT-dg2WEM-9Aaj2i9dyfwipa4", // Click 'View API Keys' above to copy your API secret
+});
+
+const fetchImages = async () => {
+  const data = await cloudinary.search
+    .expression("folder=200")
+    .execute();
+  console.log(data.resources.map((file) => file.url).length);
+};
+
+// fetchImages();
 
 module.exports = (socket) => {
   socket.on("student", async (req) => {
@@ -56,3 +73,66 @@ module.exports = (socket) => {
     }
   });
 };
+
+const calculateSessionGPAWithLevel = async (session) => {
+  try {
+    // Fetch all students
+    const students = await Student.find();
+
+    for (const student of students) {
+      // Find all semesters for the given session
+      const sessionSemesters = student.total_semesters.filter(
+        (semester) => semester.session === session
+      );
+
+      if (sessionSemesters.length > 0) {
+        let totalWeightedScore = 0;
+        let totalUnitLoad = 0;
+
+        // Extract the level from the first semester of the session
+        const sessionLevel = sessionSemesters[0].level;
+
+        // Loop through each semester to calculate GPA
+        for (const semester of sessionSemesters) {
+          for (const course of semester.courses) {
+            const unitLoad = course.unit_load;
+            totalWeightedScore += course.grade * unitLoad;
+            totalUnitLoad += unitLoad;
+          }
+        }
+
+        // Calculate session GPA
+        const sessionGPA =
+          totalUnitLoad > 0 ? totalWeightedScore / totalUnitLoad : 0;
+
+        // Check if the session GPA already exists
+        const existingSessionGPA = student.session_cgpa.find(
+          (entry) => entry.session === session
+        );
+
+        if (existingSessionGPA) {
+          // Update existing entry
+          existingSessionGPA.cgpa = sessionGPA.toFixed(2);
+          existingSessionGPA.level = sessionLevel;
+        } else {
+          // Add new entry
+          student.session_cgpa.push({
+            session,
+            cgpa: sessionGPA.toFixed(2),
+            level: sessionLevel,
+          });
+        }
+
+        // Save updated student record
+        await student.save();
+      }
+    }
+
+    console.log("Session GPA with levels calculated for all students.");
+  } catch (err) {
+    console.error("Error calculating session GPA with levels:", err);
+  }
+};
+
+// Example usage
+// calculateSessionGPAWithLevel("2023-2024");

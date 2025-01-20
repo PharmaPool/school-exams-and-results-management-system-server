@@ -36,7 +36,13 @@ const student_schema = new Schema({
     },
   ],
   cgpa: { type: Number, default: 0 },
-  session_cgpa: [{ session: { type: String }, cgpa: { type: Number } }],
+  session_cgpa: [
+    {
+      session: { type: String },
+      cgpa: { type: Number },
+      level: { type: Number },
+    },
+  ],
 });
 
 module.exports = mongoose.model("Student", student_schema);
