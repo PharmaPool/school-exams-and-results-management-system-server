@@ -22,7 +22,7 @@ module.exports = {
   pcl256: "pharmaceutical biochemistry ii",
   pmb272: "introductory biotechnology",
   cpm282: "neuroanatomy for pharmacy students",
-  cpm284: "practical anatomy and distology foor pharmacy students",
+  cpm284: "practical anatomy and distology for pharmacy students",
   pti311: "pharmaceutical technology i",
   pti313: "practical pharmaceutical technology",
   pct321: "physical pharmaceutics",

@@ -367,7 +367,7 @@ module.exports.add_score = async (req, res, next) => {
     course.ca = Number(ca);
     course.exam = Number(exam);
     course.total = Number(exam) + Number(ca);
-    if (course_code === "pct222" || course_code === "pct422") {
+    if (course_code === "pct224" || course_code === "pct422") {
       course.grade = await ceutics_grade(Number(exam) + Number(ca));
     } else if (course_code in professionals) {
       course.grade = await get_grade(Number(exam) + Number(ca));
@@ -446,8 +446,7 @@ module.exports.get_error_students = async (req, res, next) => {
   try {
     const current_session = await Session.findOne({
       session: cur_session,
-    })
-      .populate("classes")
+    }).populate("classes");
     const previous_session = await Session.findOne({
       session: prev_session,
     }).populate("classes");
@@ -464,3 +463,248 @@ module.exports.get_error_students = async (req, res, next) => {
     console.log(error);
   }
 };
+
+const approximateScores = async () => {
+  try {
+    // Fetch all students
+    const students = await Student.find();
+
+    for (const student of students) {
+      // Iterate through each semester
+      for (const semester of student.total_semesters) {
+        for (const course of semester.courses) {
+          if (
+            course.course_code === "pct224" ||
+            course.course_code === "pct422"
+          ) {
+            course.grade = ceutics_grade(course.total);
+          } else if (course.course_code in professionals) {
+            course.grade = get_grade(course.total);
+          } else {
+            course.grade = external_grade(course.total);
+          }
+        }
+      }
+      await student.save();
+      console.log(`Scores approximated successfully for ${student.reg_no}`);
+    }
+
+    console.log("Scores approximated successfully for all eligible courses.");
+  } catch (err) {
+    console.error("Error approximating scores:", err);
+  }
+};
+
+// Call the function
+// approximateScores();
+
+const calculateSessionGPAWithLevel = async (session) => {
+  try {
+    // Fetch all students
+    const students = await Student.find();
+
+    for (const student of students) {
+      // Find all semesters for the given session
+      const sessionSemesters = student.total_semesters.filter(
+        (semester) => semester.session === session
+      );
+
+      if (sessionSemesters.length > 0) {
+        let totalWeightedScore = 0;
+        let totalUnitLoad = 0;
+
+        // Extract the level from the first semester of the session
+        const sessionLevel = sessionSemesters[0].level;
+
+        // Loop through each semester to calculate GPA
+        for (const semester of sessionSemesters) {
+          for (const course of semester.courses) {
+            const unitLoad = course.corrected_unit_load || course.unit_load;
+            totalWeightedScore += course.grade * unitLoad;
+            totalUnitLoad += unitLoad;
+          }
+        }
+
+        // Calculate session GPA
+        const sessionGPA =
+          totalUnitLoad > 0 ? totalWeightedScore / totalUnitLoad : 0;
+
+        // Check if the session GPA already exists
+        const existingSessionGPA = student.session_cgpa.find(
+          (entry) => entry.session === session
+        );
+
+        if (existingSessionGPA) {
+          // Update existing entry
+          existingSessionGPA.cgpa = sessionGPA.toFixed(2);
+          existingSessionGPA.level = sessionLevel;
+        } else {
+          // Add new entry
+          student.session_cgpa.push({
+            session,
+            cgpa: sessionGPA.toFixed(2),
+            level: sessionLevel,
+          });
+        }
+
+        // Save updated student record
+        await student.save();
+      }
+    }
+
+    console.log("Session GPA with levels calculated for all students.");
+  } catch (err) {
+    console.error("Error calculating session GPA with levels:", err);
+  }
+};
+
+// Example usage
+// calculateSessionGPAWithLevel("2022-2023");
+
+const calculateCGPA = async () => {
+  try {
+    const students = await Student.find();
+
+    for (const student of students) {
+      let totalScore = 0;
+      let totalUnits = 0;
+
+      for (const semester of student.total_semesters) {
+        for (const course of semester.courses) {
+          totalScore += course.grade * course.unit_load; // Calculate weighted score
+          totalUnits += course.unit_load; // Accumulate total unit load
+        }
+      }
+
+      const cgpa = totalUnits > 0 ? totalScore / totalUnits : 0; // Avoid division by zero
+      student.cgpa = cgpa.toFixed(2); // Save CGPA rounded to 2 decimal places
+      await student.save();
+      console.log(`cgpa of ${student.fullname} updated!`);
+    }
+
+    console.log("CGPA calculated and updated for all students.");
+  } catch (err) {
+    console.error("Error calculating CGPA:", err);
+  }
+};
+
+// Call the function
+// calculateCGPA();
+
+const calculateStudentSessionalGPA = async (reg_no, session) => {
+  try {
+    // Fetch the student by registration number
+    const student = await Student.findOne({ reg_no });
+
+    if (!student) {
+      console.error("Student not found");
+      return;
+    }
+
+    // Get all semesters for the specified session
+    const semestersInSession = student.total_semesters.filter(
+      (semester) => semester.session === session
+    );
+
+    if (semestersInSession.length === 0) {
+      console.error("No semesters found for the specified session");
+      return;
+    }
+
+    let totalScore = 0;
+    let totalUnits = 0;
+    const sessionLevel = semestersInSession[0].level; // Take the level from the first semester
+
+    // Calculate the total score and unit load
+    semestersInSession.forEach((semester) => {
+      semester.courses.forEach((course) => {
+        totalScore += course.grade * course.unit_load;
+        totalUnits += course.unit_load;
+      });
+    });
+
+    // Compute the SGPA
+    const sgpa = totalUnits > 0 ? totalScore / totalUnits : 0;
+
+    // Check if the sessional GPA already exists in session_cgpa
+    const existingSession = student.session_cgpa.find(
+      (entry) => entry.session === session
+    );
+
+    if (existingSession) {
+      // Update the SGPA and level
+      existingSession.cgpa = sgpa.toFixed(2);
+      existingSession.level = sessionLevel;
+    } else {
+      // Add a new entry for the SGPA
+      student.session_cgpa.push({
+        session,
+        cgpa: sgpa.toFixed(2),
+        level: sessionLevel,
+      });
+    }
+
+    // Save the updated student record
+    await student.save();
+
+    console.log(
+      `Sessional GPA for session ${session} updated:`,
+      sgpa.toFixed(2)
+    );
+    return sgpa.toFixed(2);
+  } catch (err) {
+    console.error("Error calculating Sessional GPA:", err);
+  }
+};
+
+// Example Usage
+// calculateStudentSessionalGPA("2020/249336", "2022-2023");
+
+const calculateSemesterGPAForAllStudents = async () => {
+  try {
+    // Fetch all students
+    const students = await Student.find();
+
+    if (!students || students.length === 0) {
+      console.log("No students found.");
+      return;
+    }
+
+    // Loop through all students
+    for (const student of students) {
+      let updated = false; // Track if any semester's GPA is updated
+
+      // Loop through all semesters for the student
+      for (const semester of student.total_semesters) {
+        let totalScore = 0;
+        let totalUnits = 0;
+
+        // Calculate GPA for the current semester
+        semester.courses.forEach((course) => {
+          totalScore += course.grade * course.unit_load;
+          totalUnits += course.unit_load;
+        });
+
+        // Calculate GPA and update the semester object
+        const gpa = totalUnits > 0 ? totalScore / totalUnits : 0;
+        if (semester.gpa !== gpa.toFixed(2)) {
+          semester.gpa = gpa.toFixed(2); // Update the GPA
+          updated = true;
+        }
+      }
+
+      // Save the student only if any semester GPA was updated
+      if (updated) {
+        await student.save();
+        console.log(`Updated semester GPA for student: ${student.reg_no}`);
+      }
+    }
+
+    console.log("Semester GPA calculation for all students completed.");
+  } catch (err) {
+    console.error("Error calculating semester GPA:", err);
+  }
+};
+
+// Execute the function
+// calculateSemesterGPAForAllStudents();

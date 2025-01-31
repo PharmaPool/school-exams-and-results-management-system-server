@@ -14,9 +14,7 @@ cloudinary.config({
 });
 
 const fetchImages = async () => {
-  const data = await cloudinary.search
-    .expression("folder=200")
-    .execute();
+  const data = await cloudinary.search.expression("folder=200").execute();
   console.log(data.resources.map((file) => file.url).length);
 };
 
@@ -135,4 +133,69 @@ const calculateSessionGPAWithLevel = async (session) => {
 };
 
 // Example usage
-// calculateSessionGPAWithLevel("2023-2024");
+// calculateSessionGPAWithLevel("2022-2023");
+
+const calculateSessionalGPA = async () => {
+  try {
+    // Fetch all students from the database
+    const students = await Student.find();
+
+    for (const student of students) {
+      const sessions = {}; // To group semesters by session
+
+      // Group semesters by session
+      student.total_semesters.forEach((semester) => {
+        if (!sessions[semester.session]) {
+          sessions[semester.session] = [];
+        }
+        sessions[semester.session].push(semester);
+      });
+
+      for (const [session, semesters] of Object.entries(sessions)) {
+        let totalScore = 0;
+        let totalUnits = 0;
+        let sessionLevel = semesters[0].level; // Use the level from the first semester in the session
+
+        // Calculate the total score and units for the session
+        semesters.forEach((semester) => {
+          semester.courses.forEach((course) => {
+            totalScore += course.grade * course.unit_load;
+            totalUnits += course.unit_load;
+          });
+        });
+
+        // Compute the Sessional GPA
+        const sgpa = totalUnits > 0 ? totalScore / totalUnits : 0;
+
+        // Check if the sessional GPA already exists in session_cgpa
+        const existingSession = student.session_cgpa.find(
+          (entry) => entry.session === session
+        );
+
+        if (existingSession) {
+          // Update the sessional GPA and level
+          existingSession.cgpa = sgpa.toFixed(2);
+          existingSession.level = sessionLevel;
+        } else {
+          // Add a new sessional GPA entry
+          student.session_cgpa.push({
+            session,
+            cgpa: sgpa.toFixed(2),
+            level: sessionLevel,
+          });
+        }
+      }
+
+      // Save the updated student document
+      await student.save();
+      console.log(`done with ${student.fullname}`);
+    }
+
+    console.log("Sessional GPA calculated and updated for all students.");
+  } catch (err) {
+    console.error("Error calculating Sessional GPA:", err);
+  }
+};
+
+// Call the function
+// calculateSessionalGPA();

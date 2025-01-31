@@ -5,7 +5,7 @@ module.exports = {
 
     await semester.courses.map((course) => {
       total_score += course.grade * course.unit_load;
-      total_units += course.corrected_unit_load;
+      total_units += course.unit_load;
     });
 
     const gpa = total_score / total_units;
@@ -14,16 +14,16 @@ module.exports = {
   },
   get_session_gpa: async (first_semester, second_semester) => {
     let total_score = 0,
-    total_units = 0;
-    
+      total_units = 0;
+
     await first_semester.courses.map((course) => {
       total_score += course.grade * course.unit_load;
-      total_units += course.corrected_unit_load;
+      total_units += course.unit_load;
     });
-    
+
     await second_semester.courses.map((course) => {
       total_score += course.grade * course.unit_load;
-      total_units += course.corrected_unit_load;
+      total_units += course.unit_load;
     });
 
     const gpa = total_score / total_units;
@@ -37,7 +37,7 @@ module.exports = {
     await total_courses.map((semester) =>
       semester.courses.map((course) => {
         total_score += course.grade * course.unit_load;
-        total_units += course.corrected_unit_load;
+        total_units += course.unit_load;
       })
     );
 
