@@ -1,0 +1,201 @@
+[{
+  "_id": {
+    "$oid": "675f6048e973506d2b57c297"
+  },
+  "session": "2023-2024",
+  "classes": [
+    {
+      "$oid": "675f6048e973506d2b57c298"
+    },
+    {
+      "$oid": "675f6048e973506d2b57c29b"
+    },
+    {
+      "$oid": "675f6048e973506d2b57c29e"
+    },
+    {
+      "$oid": "675f6048e973506d2b57c2a1"
+    },
+    {
+      "$oid": "675f6048e973506d2b57c2a4"
+    },
+    {
+      "$oid": "675f6048e973506d2b57c2a7"
+    }
+  ],
+  "current": true,
+  "externals": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "675f6057e973506d2b57c2ae"
+  },
+  "session": "2022-2023",
+  "classes": [
+    {
+      "$oid": "675f6057e973506d2b57c2af"
+    },
+    {
+      "$oid": "675f6057e973506d2b57c2b2"
+    },
+    {
+      "$oid": "675f6057e973506d2b57c2b5"
+    },
+    {
+      "$oid": "675f6057e973506d2b57c2b8"
+    },
+    {
+      "$oid": "675f6057e973506d2b57c2bb"
+    },
+    {
+      "$oid": "675f6057e973506d2b57c2be"
+    }
+  ],
+  "current": false,
+  "externals": [
+    {
+      "course_code": "hks236",
+      "course_title": "principles and methods of exercise prescription for diverse population",
+      "unit_load": 2,
+      "semester": 2,
+      "_id": {
+        "$oid": "679247e8b4f05be34077014c"
+      }
+    },
+    {
+      "course_code": "hks236",
+      "course_title": "principles and methods of exercise prescription for diverse population",
+      "unit_load": 2,
+      "semester": 2,
+      "_id": {
+        "$oid": "67924b52b4f05be3407bb63e"
+      }
+    },
+    {
+      "course_code": "hed274",
+      "course_title": "emotional mental and social health",
+      "unit_load": 2,
+      "semester": 2,
+      "_id": {
+        "$oid": "679b36e0d2a8ede16e36a1f8"
+      }
+    }
+  ],
+  "__v": 4
+},
+{
+  "_id": {
+    "$oid": "675f606ee973506d2b57c2c5"
+  },
+  "session": "2021-2022",
+  "classes": [
+    {
+      "$oid": "675f606ee973506d2b57c2c6"
+    },
+    {
+      "$oid": "675f606ee973506d2b57c2c9"
+    },
+    {
+      "$oid": "675f606ee973506d2b57c2cc"
+    },
+    {
+      "$oid": "675f606ee973506d2b57c2cf"
+    },
+    {
+      "$oid": "675f606ee973506d2b57c2d2"
+    },
+    {
+      "$oid": "675f606ee973506d2b57c2d5"
+    }
+  ],
+  "current": false,
+  "externals": [
+    {
+      "course_code": "hed145",
+      "course_title": "nutrition education",
+      "unit_load": 2,
+      "semester": 2,
+      "_id": {
+        "$oid": "679a35837029bd624251d740"
+      }
+    },
+    {
+      "course_code": "hed174",
+      "course_title": "lifestyle for health and wellness",
+      "unit_load": 2,
+      "semester": 2,
+      "_id": {
+        "$oid": "679a35e17029bd624254d398"
+      }
+    },
+    {
+      "course_code": "hed176",
+      "course_title": "health promotion approaches and education",
+      "unit_load": 2,
+      "semester": 2,
+      "_id": {
+        "$oid": "679a36087029bd62425710b9"
+      }
+    }
+  ],
+  "__v": 3
+},
+{
+  "_id": {
+    "$oid": "675f6079e973506d2b57c2dc"
+  },
+  "session": "2020-2021",
+  "classes": [
+    {
+      "$oid": "675f6079e973506d2b57c2dd"
+    },
+    {
+      "$oid": "675f6079e973506d2b57c2e0"
+    },
+    {
+      "$oid": "675f6079e973506d2b57c2e3"
+    },
+    {
+      "$oid": "675f6079e973506d2b57c2e6"
+    },
+    {
+      "$oid": "675f6079e973506d2b57c2e9"
+    },
+    {
+      "$oid": "675f6079e973506d2b57c2ec"
+    }
+  ],
+  "current": false,
+  "externals": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "675f6089e973506d2b57c2f3"
+  },
+  "session": "2019-2020",
+  "classes": [
+    {
+      "$oid": "675f6089e973506d2b57c2f4"
+    },
+    {
+      "$oid": "675f6089e973506d2b57c2f7"
+    },
+    {
+      "$oid": "675f6089e973506d2b57c2fa"
+    },
+    {
+      "$oid": "675f6089e973506d2b57c2fd"
+    },
+    {
+      "$oid": "675f6089e973506d2b57c300"
+    },
+    {
+      "$oid": "675f6089e973506d2b57c303"
+    }
+  ],
+  "current": false,
+  "externals": [],
+  "__v": 0
+}]
